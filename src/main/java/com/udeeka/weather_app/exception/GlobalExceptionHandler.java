@@ -1,10 +1,14 @@
 package com.udeeka.weather_app.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Data
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,15 +25,11 @@ public class GlobalExceptionHandler {
     }
 }
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 class ErrorResponse {
     private int status;
     private String message;
 
-    public ErrorResponse(int status, String message) {
-        this.status = status;
-        this.message = message;
-    }
-
-    public int getStatus() { return status; }
-    public String getMessage() { return message; }
 }

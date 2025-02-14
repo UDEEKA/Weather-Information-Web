@@ -1,14 +1,15 @@
 package com.udeeka.weather_app.service;
 
 import com.udeeka.weather_app.dto.OpenWeatherResponse;
-import com.udeeka.weather_app.exception.CityNotFoundException;
 import com.udeeka.weather_app.model.WeatherInfo;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class WeatherService {
@@ -17,37 +18,41 @@ public class WeatherService {
     private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final CityService cityService;
 
-    public WeatherInfo getWeatherInfo(String cityId) {
-        String url = String.format(
-                "http://api.openweathermap.org/data/2.5/weather?id=%s&units=metric&appid=%s",
-                cityId, apiKey
-        );
-
-        try {
-            ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url, OpenWeatherResponse.class);
-
-            if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-                throw new CityNotFoundException("City not found for ID: " + cityId);
-            }
-
-            OpenWeatherResponse responseBody = response.getBody();
-            return mapToWeatherInfo(responseBody);
-
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new CityNotFoundException("City not found for ID: " + cityId);
-        }
+    public WeatherService(CityService cityService) {
+        this.cityService = cityService;
     }
 
-    private WeatherInfo mapToWeatherInfo(OpenWeatherResponse response) {
-        if (response == null || response.getWeather() == null || response.getWeather().isEmpty()) {
-            throw new RuntimeException("Invalid API response");
+    @Cacheable(value = "weather", key = "'allCities'", unless = "#result == null")
+    public List<WeatherInfo> getWeatherForAllCities() {
+        List<String> cityIds = cityService.getCityIds();
+        if (cityIds.isEmpty()) {
+            throw new RuntimeException("No city IDs found");
         }
 
+        String joinedCityIds = String.join(",", cityIds);
+        String url = String.format(
+                "http://api.openweathermap.org/data/2.5/group?id=%s&units=metric&appid=%s",
+                joinedCityIds, apiKey
+        );
+
+        ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url, OpenWeatherResponse.class);
+        if (response.getBody() == null || response.getBody().getList() == null) {
+            throw new RuntimeException("Failed to fetch weather data");
+        }
+
+        return response.getBody().getList().stream()
+                .map(this::mapToWeatherInfo)
+                .collect(Collectors.toList());
+    }
+
+    private WeatherInfo mapToWeatherInfo(OpenWeatherResponse.CityWeather cityWeather) {
         return new WeatherInfo(
-                response.getName(),
-                response.getWeather().get(0).getDescription(),
-                response.getMain().getTemp()
+                cityWeather.getCityCode(),
+                cityWeather.getName(),
+                cityWeather.getWeather().get(0).getDescription(),
+                cityWeather.getMain().getTemp()
         );
     }
 }

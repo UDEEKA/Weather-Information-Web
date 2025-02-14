@@ -3,14 +3,18 @@ package com.udeeka.weather_app.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.Getter;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 
+@Getter
 @Data
 @Service
 public class CityService {
@@ -23,7 +27,8 @@ public class CityService {
     private void loadCityIds() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode root = objectMapper.readTree(new File("src/main/resources/cities.json"));
+            InputStream inputStream = new ClassPathResource("cities.json").getInputStream();
+            JsonNode root = objectMapper.readTree(inputStream);
             JsonNode citiesList = root.get("List");
 
             if (citiesList != null && citiesList.isArray()) {
@@ -34,9 +39,6 @@ public class CityService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    public List<String> getCityIds() {
-        return cityIds;
     }
 
 }
