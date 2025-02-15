@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,12 @@ public class WeatherService {
 
     @Cacheable(value = "weather", key = "'allCities'", unless = "#result == null")
     public List<WeatherInfo> getWeatherForAllCities() {
+
         List<String> cityIds = cityService.getCityIds();
         if (cityIds.isEmpty()) {
             throw new RuntimeException("No city IDs found");
         }
+
 
         String joinedCityIds = String.join(",", cityIds);
         String url = String.format(
