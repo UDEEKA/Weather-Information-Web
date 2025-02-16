@@ -50,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_"); // Ensure roles have 'ROLE_' prefix
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
         grantedAuthoritiesConverter.setAuthoritiesClaimName("https://weather-app.com/roles"); // Extract roles from JWT claim
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
