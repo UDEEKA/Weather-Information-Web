@@ -1,0 +1,54 @@
+# Ignore IntelliJ IDEA project files
+.idea/
+
+# Ignore environment variable files
+.env
+
+# Ignore Maven target directory
+target/
+
+# Ignore compiled class files
+*.class
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE-specific files
+*.iml
+*.ipr
+*.iws
+
+# Ignore dependency caches and build artifacts
+.mvn/
+.m2/
+
+# Ignore node_modules if front-end files are added later
+node_modules/
+
+# Ignore test reports
+/test-output/
+coverage/
+*.coverage
+
+# Ignore VS Code workspace settings (if applicable)
+.vscode/
+
+# Ignore JAR and WAR files
+*.jar
+*.war
+
+# Ignore sensitive application configuration files
+/application.properties
+/config/
+
+# Ignore JSON data files
+cities.json

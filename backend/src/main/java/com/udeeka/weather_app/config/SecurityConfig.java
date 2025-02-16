@@ -1,5 +1,6 @@
 package com.udeeka.weather_app.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,29 +17,36 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize for method-level security
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+
+    @Value("${frontend.url.prod}")
+    private String frontendUrlProd;
+
+    // for handle cors
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // ✅ Configure CORS to allow frontend requests
+                //  Configure CORS to allow frontend requests
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173")); // Allow frontend
+                    config.setAllowedOrigins(List.of(frontendUrlProd)); // Allow frontend
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                // ✅ Disable CSRF since it's a backend API
+                // Disable CSRF since it's a backend API
                 .csrf(csrf -> csrf.disable())
-                // ✅ Secure endpoints: Require authentication for "/weather/all"
+                //Secure endpoints: Require authentication for "/weather/all"
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/weather/all").hasAuthority("ROLE_USER") // Require ROLE_USER for this API
+                        .requestMatchers("/weather/all").hasAuthority("ROLE_USER")
                         .anyRequest().permitAll() // Allow other requests
                 )
-                // ✅ Configure OAuth2 JWT authentication
+                //Configure OAuth2 JWT authentication
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 );
@@ -46,7 +54,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Extract roles from the JWT token
+    //Extract roles from the JWT token
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -59,11 +67,11 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    // ✅ CORS configuration for allowing frontend requests
+    //CORS configuration for allowing frontend requests
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // Allow frontend requests
+        config.setAllowedOrigins(List.of(frontendUrl)); // Allow frontend requests
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

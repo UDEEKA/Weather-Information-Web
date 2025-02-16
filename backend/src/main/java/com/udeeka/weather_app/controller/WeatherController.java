@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173") // ✅ Allow frontend requests
+@CrossOrigin(origins = "http://localhost:5173") //Allow frontend requests
 @RestController
 @RequestMapping("/weather")
 public class WeatherController {
@@ -18,7 +18,7 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    // ✅ Secure API: Only users with ROLE_USER can access
+    //Secure API: Only users with ROLE_USER can access
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_USER')")
     public List<WeatherInfo> getAllWeatherData() {
