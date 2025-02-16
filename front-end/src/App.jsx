@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import LoginButton from "./components/LoginButton";
 import LogoutButton from "./components/LogoutButton";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import LoginPage from "./components/LoginPage";
 import HomePage from "./components/HomePage";
 
 const App = () => {
@@ -11,19 +11,26 @@ const App = () => {
 
   return (
     <Router>
-      <div className="position-relative">
-        {isAuthenticated && (
-          <div className="position-absolute top-0 end-0 mt- me-3 p-3 bg-white shadow rounded">
-            <p className="text-center fw-bold mb-2">Welcome, {user.name}</p>
-            <div className="d-flex justify-content-center">
+      <div className="container">
+        <h1 className="text-center mb-2">Weather App</h1>
+        {isAuthenticated ? (
+          <>
+            <div className="d-flex justify-content-end align-items-center mb-2">
+              <p className="text-center font-weight-bold font-italic mb-2">Welcome, {user.name}</p>
+            </div>
+
+            <HomePage />
+            <div className="d-flex justify-content-center align-items-center">
               <LogoutButton />
             </div>
-          </div>
-        )}
+          </>
+        ) : (
+          <div className="d-flex justify-content-center align-items-center">
 
-        <div className="container">
-          {isAuthenticated ? <HomePage /> : <LoginPage />}
-        </div>
+            <LoginButton />
+          </div>
+
+        )}
       </div>
     </Router>
   );

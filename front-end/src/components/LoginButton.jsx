@@ -4,11 +4,9 @@ const LoginButton = () => {
     const { loginWithRedirect } = useAuth0();
 
     return (
-        <div className="d-grid gap-2">
-        <button className="btn btn-primary btn-lg" onClick={() =>
+        <button className="btn btn-primary" onClick={() =>
             loginWithRedirect()}>Log in
         </button>
-        </div>
     )
 };
 
